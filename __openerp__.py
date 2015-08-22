@@ -13,7 +13,7 @@
         Do note that chargebacks will still need to be handled manually.
     """,
 
-    'author': "LasLabs",
+    'author': "LasLabs, Inc.",
     'website': "https://laslabs.com",
 
     # Categories can be used to filter modules in modules listing
