@@ -79,3 +79,11 @@ Traceback (most recent call last):
     raise ValidationError(error_msg)
 ValidationError: Authorize: received data for reference SALE/2015/1234; no order found
 ```
+
+# Contributers
+
+Copyright © LasLabs, Inc. [https://laslabs.com]
+License AGPL-3
+
+
+* Written by Dave Lasley <dave@laslabs.com>

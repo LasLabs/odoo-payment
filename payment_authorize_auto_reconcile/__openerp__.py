@@ -20,18 +20,7 @@
 ##############################################################################
 {
     'name': "payment_authorize_auto_reconcile",
-
-    'summary': """
-        Automatically reconcile Authorize.net payments against appropriate Invoice
-    """,
-
-    'description': """
-        Authorize.net payments do not automatically generate transactions.
-        This plugin automates the process by creating a transaction and
-            reconciling it against the appropriate invoice.
-        Do note that chargebacks will still need to be handled manually.
-    """,
-
+    'license': 'AGPL-3',
     'author': "LasLabs",
     'website': "https://laslabs.com",
     'category': 'Hidden',
