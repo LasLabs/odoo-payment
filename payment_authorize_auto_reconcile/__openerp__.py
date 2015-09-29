@@ -26,7 +26,7 @@
     'category': 'Hidden',
     'version': '8.0.1.0',
     'depends': [
-        'payment', 
+        'payment',
         'payment_authorize',
     ],
 }
