@@ -2,7 +2,7 @@
 from openerp import models, fields, api
 
 
-class TxAuthorize(object):
+class PaymentTransaction(models.Model):
     _inherit = 'payment.transaction'
     
     @api.model
@@ -39,7 +39,7 @@ class TxAuthorize(object):
                 ('internal_number', '=', reference)
             ], limit=1)
             acquirer = self.env['payment.acquirer'].search([
-                ('name', '=', 'Authorize.Net'),
+                ('provider', '=', 'authorize'),
                 ('company_id', '=', invoice.company_id.id)
             ], limit=1)
             

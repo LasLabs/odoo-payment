@@ -1,2 +1,2 @@
 # -*- coding: utf-8 -*-
-import models
+from . import payment_authorize_auto_reconcile

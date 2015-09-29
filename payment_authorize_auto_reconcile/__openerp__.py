@@ -23,7 +23,10 @@
     'version': '1.0',
 
     # any module necessary for this one to work correctly
-    'depends': ['payment_authorize', ],
+    'depends': [
+        'payment', 
+        'payment_authorize',
+    ],
 
     # always loaded
     'data': [
