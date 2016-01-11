@@ -1,8 +1,22 @@
 # -*- coding: utf-8 -*-
 ##############################################################################
 #
-#    Author: Dave Lasley <dave@laslabs.com>
-#    Copyright: 2015 LasLabs, Inc.
+#    Copyright (C) LasLabs, Inc [https://laslabs.com]. All Rights Reserved
+#
+##############################################################################
+#
+#    Collaborators of this module:
+#       Written By: Dave Lasley <dave@laslabs.com>
+#
+##############################################################################
+#
+#    This project is mantained by Medical Team:
+#    https://repo.laslabs.com/projects/ODOO/repos/payment
+#
+##############################################################################
+#
+#    It is a collaborative effort between several companies that want to join
+#    efforts in have a proposal solid and strong in the Health Care environment
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -24,9 +38,8 @@
     'author': "LasLabs",
     'website': "https://laslabs.com",
     'category': 'Hidden',
-    'version': '8.0.1.0',
+    'version': '8.0.1.0.0',
     'depends': [
-        'payment',
         'payment_authorize',
     ],
 }
