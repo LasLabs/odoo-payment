@@ -4,8 +4,8 @@
 
 # License
 
-Copyright © LasLabs, Inc. [https://laslabs.com]
-License AGPL-3
+* Copyright © [LasLabs, Inc.](https://laslabs.com)
+* License AGPL-3
 
 # Contributers
 
