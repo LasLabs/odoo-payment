@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/laslabs/odoo-payment.svg?branch=master)](https://travis-ci.org/laslabs/odoo-payment)
+[![Build Status](https://travis-ci.org/laslabs/odoo-payment.svg?branch=8.0)](https://travis-ci.org/laslabs/odoo-payment)
  
 # Payment Modules for Odoo
 
