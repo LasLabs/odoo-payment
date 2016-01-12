@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/laslabs/odoo-payment_authorize_auto_reconcile.svg?branch=master)](https://travis-ci.org/laslabs/odoo-payment_authorize_auto_reconcile)
+[![Build Status](https://travis-ci.org/laslabs/odoo-payment.svg)](https://travis-ci.org/laslabs/odoo-payment)
  
 # Auto Authorize.Net Reconciliation
 
@@ -80,10 +80,11 @@ Traceback (most recent call last):
 ValidationError: Authorize: received data for reference SALE/2015/1234; no order found
 ```
 
+# License
+
+* Copyright © [LasLabs, Inc.](https://laslabs.com)
+* License AGPL-3
+
 # Contributers
 
-Copyright © LasLabs, Inc. [https://laslabs.com]
-License AGPL-3
-
-* Written by Dave Lasley <dave@laslabs.com>
-
+* Dave Lasley <dave@laslabs.com>
