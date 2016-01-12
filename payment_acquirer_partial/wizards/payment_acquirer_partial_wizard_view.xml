@@ -19,19 +19,22 @@
                     </header>
                     <sheet>
                         <group name="data">
-                            <field name="acquirer_id" domain="[
-                                       ('website_published', '=', True),
+                            <field name="company_id" invisible="True" />
+                            <field name="acquirer_id"
+                                   options="{'no_create': True, }"
+                                   on_change="on_change_data(invoice_id, acquirer_id, pay_amount)"
+                                   domain="[
+                                        ('company_id', '=', company_id),
+                                        ('website_published', '=', True),
                                    ]"/>
-                            <field name="pay_amount" />
+                            <field name="pay_amount"
+                                   on_change="on_change_data(invoice_id, acquirer_id, pay_amount)" />
                         </group>
+                        <h2>Payment Portal:</h2>
+                        <field name="payment_block" widget="html" />
                     </sheet>
                     <footer>
-                        <button special="cancel"
-                                string="Cancel" />
-                        <button name="generate_acquirer_display"
-                                string="Next"
-                                type="object"
-                                class="oe_highlight" />
+                        <button special="cancel" string="Cancel" />
                     </footer>
                 </form>
             </field>
