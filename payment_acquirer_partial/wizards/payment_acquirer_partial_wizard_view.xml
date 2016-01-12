@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+    Copyright (C) 2014-[Now] LasLabs [https://laslabs.com]
+    @author Dave Lasley <dave@laslabs.com>
+    The licence is in the file __openerp__.py
+-->
+
+<openerp>
+    <data>
+        
+        <record model="ir.ui.view" id="payment_acquirer_partial_wizard_view">
+            <field name="name">payment.acquirer.partial.wizard.view</field>
+            <field name="model">payment.acquirer.partial.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Payment Details">
+                    <header>
+                        <field name="invoice_id" />
+                    </header>
+                    <sheet>
+                        <group name="data">
+                            <field name="acquirer_id" domain="[
+                                       ('website_published', '=', True),
+                                   ]"/>
+                            <field name="pay_amount" />
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button special="cancel"
+                                string="Cancel" />
+                        <button name="generate_acquirer_display"
+                                string="Next"
+                                type="object"
+                                class="oe_highlight" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+        
+        <act_window src_model="account.invoice"
+                    res_model="payment.acquirer.partial.wizard"
+                    id="payment_acquirer_partial_wizard_action"
+                    name="Pay Partial Amount"
+                    view_mode="form"
+                    target="new"
+                    key2="client_action_multi"/>
+        
+    </data>
+</openerp>
