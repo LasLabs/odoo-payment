@@ -49,14 +49,14 @@ class PaymentAcquirerPartialWizard(models.TransientModel):
     @api.one
     def _compute_payment_block(self, ):
         self.payment_block = self._render_payment_block(
-            self.invoice_id.name, self.invoice_id.currency_id,
+            self.invoice_id.number, self.invoice_id.currency_id,
             self.pay_amount, self.invoice_id.partner_id,
         )
 
     def _compute_default_payment_block(self, ):
         invoice_id = self._compute_default_invoice_id()
         return self._render_payment_block(
-            invoice_id.name, invoice_id.currency_id,
+            invoice_id.number, invoice_id.currency_id,
             self._compute_default_pay_amount(),
             invoice_id.partner_id,
             self._compute_default_payment_acquirer(),
@@ -121,7 +121,7 @@ class PaymentAcquirerPartialWizard(models.TransientModel):
     def on_change_data(self, invoice_id, acquirer_id, pay_amount, ):
         invoice_id = self.env['account.invoice'].browse(invoice_id)
         payment_block = self._render_payment_block(
-            invoice_id.name, invoice_id.currency_id,
+            invoice_id.number, invoice_id.currency_id,
             pay_amount, invoice_id.partner_id,
             self.env['payment.acquirer'].browse(acquirer_id),
         )
@@ -132,13 +132,13 @@ class PaymentAcquirerPartialWizard(models.TransientModel):
         }
 
     @api.multi
-    def _render_payment_block(self, name, currency_id, pay_amount,
+    def _render_payment_block(self, number, currency_id, pay_amount,
                               partner_id, acquirer_id=None):
         if acquirer_id is None:
             self.ensure_one()
             acquirer_id = self.acquirer_id
         block = acquirer_id.render_payment_block(
-            reference=name,
+            reference=number,
             currency_id=currency_id.id,
             amount=pay_amount,
             partner_id=partner_id.id,
