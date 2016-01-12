@@ -39,4 +39,7 @@
     'depends': [
         'payment_authorize',
     ],
+    'data': [
+        'views/payment_acquirer_view.xml',
+    ]
 }

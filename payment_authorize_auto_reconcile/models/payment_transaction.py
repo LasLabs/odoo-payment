@@ -18,7 +18,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
-from openerp import models, api
+from openerp import models, api, fields
 from openerp.exceptions import ValidationError
 import logging
 
@@ -53,11 +53,10 @@ class PaymentTransaction(models.Model):
             ('number', '=', reference)
         ], limit=1)
         acquirer = self.env['payment.acquirer'].search([
-            ('provider', '=', 'Authorize.Net'),
+            ('provider', '=', 'authorize'),
             ('company_id', '=', invoice.company_id.id)
         ], limit=1)
-
-        pay_amount = data.get('x_amount')
+        pay_amount = float(data.get('x_amount'))
 
         if not tx:
 
@@ -69,6 +68,7 @@ class PaymentTransaction(models.Model):
                 'currency_id': invoice.currency_id.id,
                 'partner_id': invoice.partner_id.id,
                 'partner_country_id': invoice.partner_id.country_id.id,
+                'account_id': invoice.account_id.id,
                 'partner_state': data.get('x_state'),
                 'partner_city': data.get('x_city'),
                 'partner_street': data.get('x_address'),
@@ -85,16 +85,28 @@ class PaymentTransaction(models.Model):
             raise ValidationError(error_msg)
 
         trans_id = data.get('x_trans_id', 0)
-        _logger.debug('Paying %s on %s', pay_amount, invoice)
-        invoice.pay_and_reconcile(
-            pay_amount=pay_amount,
-            pay_account_id=invoice.account_id.id,
-            period_id=invoice.period_id.id,
-            pay_journal_id=invoice.journal_id.id,
-            writeoff_acc_id=invoice.account_id.id,
-            writeoff_period_id=invoice.period_id.id,
-            writeoff_journal_id=invoice.journal_id.id,
-            name='Authorize.net Transaction ID %s' % trans_id,
-        )
+        _type = invoice.type in (
+            'out_invoice','out_refund'
+        ) and 'receipt' or 'payment'
+
+        # voucher_obj = self.env['account.voucher'].with_context({},
+        #     invoice_id=invoice.id,
+        #     invoice_type=invoice.type,
+        #     payment_expected_currency=invoice.currency_id.id,
+        # )
+        # voucher_id = voucher_obj.create({
+        #     'partner_id': invoice.partner_id.id,
+        #     'amount': pay_amount,
+        #     'journal_id': acquirer.journal_id.id,
+        #     'date': fields.Date.today(),
+        #     'reference':'Authorize.net Transaction ID %s' % trans_id,
+        #     'currency_id': invoice.currency_id.id,
+        #     'name': 'Invoice %s' % invoice.number,
+        #     'company_id': invoice.company_id.id,
+        #     'account_id': invoice.account_id.id,
+        #     'payment_option': 'without_writeoff',
+        #     'type': _type,
+        # })
+        # voucher_id.action_move_line_create()
 
         return tx[0]
