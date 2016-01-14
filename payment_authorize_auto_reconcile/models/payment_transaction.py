@@ -37,8 +37,10 @@ class PaymentTransaction(models.Model):
         """
 
         reference = data.get('x_invoice_num')
-        trans_id = data.get('x_trans_id')
+        trans_id = data.get('x_trans_id', 0)
         fingerprint = data.get('x_MD5_Hash')
+        pay_amount = float(data.get('x_amount'))
+        date = fields.Date.today()
 
         if not reference or not trans_id or not fingerprint:
             error_msg = 'Authorize: received data with missing reference ' +\
@@ -48,27 +50,31 @@ class PaymentTransaction(models.Model):
             _logger.error(error_msg)
             raise ValidationError(error_msg)
 
-        tx = self.search([('reference', '=', reference)])
-        invoice = self.env['account.invoice'].search([
+        
+        tx = self.search([
+            ('reference', '=like', '%s%%' % reference),
+            ('state', '=', 'draft'),
+            ('amount', '=', pay_amount),
+        ])
+        invoice_id = self.env['account.invoice'].search([
             ('number', '=', reference)
         ], limit=1)
-        acquirer = self.env['payment.acquirer'].search([
+        acquirer_id = self.env['payment.acquirer'].search([
             ('provider', '=', 'authorize'),
-            ('company_id', '=', invoice.company_id.id)
+            ('company_id', '=', invoice_id.company_id.id)
         ], limit=1)
-        pay_amount = float(data.get('x_amount'))
 
         if not tx:
 
             tx_vals = {
-                'reference': reference,
-                'acquirer_id': acquirer.id,
+                'reference': '%s [%s]' % (reference, trans_id),
+                'acquirer_id': acquirer_id.id,
                 'amount': pay_amount,
                 'state': 'draft',
-                'currency_id': invoice.currency_id.id,
-                'partner_id': invoice.partner_id.id,
-                'partner_country_id': invoice.partner_id.country_id.id,
-                'account_id': invoice.account_id.id,
+                'currency_id': invoice_id.currency_id.id,
+                'partner_id': invoice_id.partner_id.id,
+                'partner_country_id': invoice_id.partner_id.country_id.id,
+                'account_id': invoice_id.account_id.id,
                 'partner_state': data.get('x_state'),
                 'partner_city': data.get('x_city'),
                 'partner_street': data.get('x_address'),
@@ -84,29 +90,31 @@ class PaymentTransaction(models.Model):
             _logger.error(error_msg)
             raise ValidationError(error_msg)
 
-        trans_id = data.get('x_trans_id', 0)
-        _type = invoice.type in (
-            'out_invoice','out_refund'
-        ) and 'receipt' or 'payment'
+        period_id = self.env['account.period'].find(date)
+        name = '%s Transaction ID %s' % (acquirer_id.name, trans_id)
+        partner_id = invoice_id.partner_id
+        if partner_id.parent_id:
+            partner_id = partner_id.parent_id
 
-        # voucher_obj = self.env['account.voucher'].with_context({},
-        #     invoice_id=invoice.id,
-        #     invoice_type=invoice.type,
-        #     payment_expected_currency=invoice.currency_id.id,
-        # )
-        # voucher_id = voucher_obj.create({
-        #     'partner_id': invoice.partner_id.id,
-        #     'amount': pay_amount,
-        #     'journal_id': acquirer.journal_id.id,
-        #     'date': fields.Date.today(),
-        #     'reference':'Authorize.net Transaction ID %s' % trans_id,
-        #     'currency_id': invoice.currency_id.id,
-        #     'name': 'Invoice %s' % invoice.number,
-        #     'company_id': invoice.company_id.id,
-        #     'account_id': invoice.account_id.id,
-        #     'payment_option': 'without_writeoff',
-        #     'type': _type,
-        # })
-        # voucher_id.action_move_line_create()
+        voucher_id = self.env['account.voucher'].create({
+           'name': name,
+           'amount': pay_amount,
+           'company_id': invoice_id.company_id.id,
+           'journal_id': acquirer_id.journal_id.id,
+           'account_id': partner_id.property_account_receivable.id,
+           'period_id': period_id.id,
+           'partner_id': partner_id.id,
+           'type': 'receipt',
+           'line_ids': [(0, 0, {
+                'name': name,
+                'payment_option': 'without_writeoff',
+                'amount': pay_amount,
+                'partner_id': partner_id.id,
+                'account_id': partner_id.property_account_receivable.id,
+                'type': 'cr',
+                'move_line_id': invoice_id.move_id.line_id[0].id,
+            })]
+        })
+        voucher_id.signal_workflow('proforma_voucher')
 
         return tx[0]
