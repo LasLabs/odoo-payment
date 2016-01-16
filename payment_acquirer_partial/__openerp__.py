@@ -1,8 +1,19 @@
 # -*- coding: utf-8 -*-
 ##############################################################################
 #
-#    Author: Dave Lasley <dave@laslabs.com>
-#    Copyright: 2015 LasLabs, Inc.
+#    Copyright (C) LasLabs, Inc [https://laslabs.com]. All Rights Reserved
+#
+##############################################################################
+#
+#    Collaborators of this module:
+#       Written By: Dave Lasley <dave@laslabs.com>
+#
+##############################################################################
+#
+#    This project is mantained by Medical Team:
+#    https://repo.laslabs.com/projects/ODOO/repos/payment
+#
+##############################################################################
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -18,5 +29,17 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
-from . import payment_transaction
-from . import payment_acquirer
+{
+    'name': "Partial Invoice Payments in Portal",
+    'license': 'AGPL-3',
+    'author': "LasLabs",
+    'website': "https://laslabs.com",
+    'category': 'Hidden',
+    'version': '8.0.1.0.0',
+    'depends': [
+        'payment',
+    ],
+    'data': [
+        'wizards/payment_acquirer_partial_wizard_view.xml',
+    ]
+}

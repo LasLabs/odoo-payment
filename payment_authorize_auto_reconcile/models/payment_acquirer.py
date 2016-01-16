@@ -18,5 +18,14 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
-from . import payment_transaction
-from . import payment_acquirer
+from openerp import models, fields
+
+
+class PaymentAcquirer(models.Model):
+    _inherit = 'payment.acquirer'
+    journal_id = fields.Many2one(
+        string='Pay To Account',
+        comodel_name='account.journal',
+        domain=[('type', 'in', ['bank', ])],
+        required=True,
+    )

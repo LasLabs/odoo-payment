@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/laslabs/odoo-payment.svg?branch=8.0)](https://travis-ci.org/laslabs/odoo-payment)
  
-# Payment Modules for Odoo
+# Allow partial customer payments on invoices
 
 # License
 

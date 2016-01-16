@@ -18,7 +18,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
-from openerp import models, api
+from openerp import models, api, fields
 from openerp.exceptions import ValidationError
 import logging
 
@@ -30,26 +30,6 @@ class PaymentTransaction(models.Model):
     _inherit = 'payment.transaction'
 
     @api.model
-    def _send_thankyou_message(self, pay_amount, invoice):
-        ''' Send a thankyou message to partners subscribed to the invoice  '''
-        last_message = invoice.message_ids[-1]
-        thread = self.env['mail.thread'].browse(last_message.res_id)
-
-        thread.sudo().message_post(
-            subject='Payment Received',
-            body='''
-            Hi %s,
-                <br /><br />
-                Your payment of %s has been received for invoice %s.
-                <br /><br />
-                We appreciate your business!''' % (
-                    invoice.partner_id.name, pay_amount,
-                    invoice.number
-            ),
-            partner_ids=[invoice.partner_id.id]
-        )
-
-    @api.model
     def _authorize_form_get_tx_from_data(self, data):
         """
         Given a data dict coming from authorize, verify it and find the related
@@ -57,8 +37,10 @@ class PaymentTransaction(models.Model):
         """
 
         reference = data.get('x_invoice_num')
-        trans_id = data.get('x_trans_id')
+        trans_id = data.get('x_trans_id', 0)
         fingerprint = data.get('x_MD5_Hash')
+        pay_amount = float(data.get('x_amount'))
+        date = fields.Date.today()
 
         if not reference or not trans_id or not fingerprint:
             error_msg = 'Authorize: received data with missing reference ' +\
@@ -68,46 +50,37 @@ class PaymentTransaction(models.Model):
             _logger.error(error_msg)
             raise ValidationError(error_msg)
 
-        tx = self.search([('reference', '=', reference)])
+        
+        tx = self.search([
+            ('reference', '=like', '%s%%' % reference),
+            ('state', '=', 'draft'),
+            ('amount', '=', pay_amount),
+        ])
+        invoice_id = self.env['account.invoice'].search([
+            ('number', '=', reference)
+        ], limit=1)
+        acquirer_id = self.env['payment.acquirer'].search([
+            ('provider', '=', 'authorize'),
+            ('company_id', '=', invoice_id.company_id.id)
+        ], limit=1)
 
         if not tx:
 
-            invoice = self.env['account.invoice'].search([
-                ('internal_number', '=', reference)
-            ], limit=1)
-            acquirer = self.env['payment.acquirer'].search([
-                ('provider', '=', 'authorize'),
-                ('company_id', '=', invoice.company_id.id)
-            ], limit=1)
-
-            pay_amount = data.get('x_amount')
-
-            tx = [self.create({
-                'reference': reference,
-                'acquirer_id': acquirer.id,
+            tx_vals = {
+                'reference': '%s [%s]' % (reference, trans_id),
+                'acquirer_id': acquirer_id.id,
                 'amount': pay_amount,
                 'state': 'draft',
-                'currency_id': invoice.currency_id.id,
-                'partner_id': invoice.partner_id.id,
-                'partner_country_id': invoice.partner_id.country_id.id,
+                'currency_id': invoice_id.currency_id.id,
+                'partner_id': invoice_id.partner_id.id,
+                'partner_country_id': invoice_id.partner_id.country_id.id,
+                'account_id': invoice_id.account_id.id,
                 'partner_state': data.get('x_state'),
                 'partner_city': data.get('x_city'),
                 'partner_street': data.get('x_address'),
-            })]
-
-            trans_id = data.get('x_trans_id', 0)
-            invoice.pay_and_reconcile(
-                pay_amount=pay_amount,
-                pay_account_id=invoice.account_id.id,
-                period_id=invoice.period_id.id,
-                pay_journal_id=invoice.journal_id.id,
-                writeoff_acc_id=invoice.account_id.id,
-                writeoff_period_id=invoice.period_id.id,
-                writeoff_journal_id=invoice.journal_id.id,
-                name='Authorize.net Transaction ID %s' % trans_id,
-            )
-
-            # self._send_thankyou_message(pay_amount, invoice)
+            }
+            _logger.debug('Creating tx with %s', tx_vals)
+            tx = [self.create(tx_vals)]
 
         elif len(tx) > 1:
             error_msg = 'Authorize: received data for reference %s' % (
@@ -116,5 +89,32 @@ class PaymentTransaction(models.Model):
             error_msg += '; multiple orders found'
             _logger.error(error_msg)
             raise ValidationError(error_msg)
+
+        period_id = self.env['account.period'].find(date)
+        name = '%s Transaction ID %s' % (acquirer_id.name, trans_id)
+        partner_id = invoice_id.partner_id
+        if partner_id.parent_id:
+            partner_id = partner_id.parent_id
+
+        voucher_id = self.env['account.voucher'].create({
+           'name': name,
+           'amount': pay_amount,
+           'company_id': invoice_id.company_id.id,
+           'journal_id': acquirer_id.journal_id.id,
+           'account_id': partner_id.property_account_receivable.id,
+           'period_id': period_id.id,
+           'partner_id': partner_id.id,
+           'type': 'receipt',
+           'line_ids': [(0, 0, {
+                'name': name,
+                'payment_option': 'without_writeoff',
+                'amount': pay_amount,
+                'partner_id': partner_id.id,
+                'account_id': partner_id.property_account_receivable.id,
+                'type': 'cr',
+                'move_line_id': invoice_id.move_id.line_id[0].id,
+            })]
+        })
+        voucher_id.signal_workflow('proforma_voucher')
 
         return tx[0]

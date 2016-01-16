@@ -15,9 +15,6 @@
 #
 ##############################################################################
 #
-#    It is a collaborative effort between several companies that want to join
-#    efforts in have a proposal solid and strong in the Health Care environment
-#
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
 #    published by the Free Software Foundation, either version 3 of the
@@ -42,4 +39,7 @@
     'depends': [
         'payment_authorize',
     ],
+    'data': [
+        'views/payment_acquirer_view.xml',
+    ]
 }
