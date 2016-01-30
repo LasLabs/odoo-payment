@@ -1,19 +1,8 @@
 # -*- coding: utf-8 -*-
 ##############################################################################
 #
-#    Copyright (C) LasLabs, Inc [https://laslabs.com]. All Rights Reserved
-#
-##############################################################################
-#
-#    Collaborators of this module:
-#       Written By: Dave Lasley <dave@laslabs.com>
-#
-##############################################################################
-#
-#    This project is mantained by Medical Team:
-#    https://repo.laslabs.com/projects/ODOO/repos/payment
-#
-##############################################################################
+#    Author: Dave Lasley <dave@laslabs.com>
+#    Copyright: 2016-TODAY LasLabs, Inc. [https://laslabs.com]
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -29,18 +18,28 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
-{
-    'name': "payment_authorize_auto_reconcile",
-    'license': 'AGPL-3',
-    'author': "LasLabs",
-    'website': "https://laslabs.com",
-    'category': 'Hidden',
-    'version': '8.0.1.0.0',
-    'depends': [
-        'payment_authorize',
-        'account_voucher',
-    ],
-    'data': [
-        'views/payment_acquirer_view.xml',
-    ]
-}
+
+from openerp.tests.common import TransactionCase
+
+
+class SomethingCase(TransactionCase):
+    def setUp(self, *args, **kwargs):
+        result = super(SomethingCase, self).setUp(*args, **kwargs)
+
+        # TODO Replace this for something useful or delete this method
+        self.do_something_before_all_tests()
+
+        return result
+
+    def tearDown(self, *args, **kwargs):
+        # TODO Replace this for something useful or delete this method
+        self.do_something_after_all_tests()
+
+        return super(SomethingCase, self).tearDown(*args, **kwargs)
+
+    def test_something(self):
+        """First line of docstring appears in test logs.
+        Other lines do not.
+        Any method starting with ``test_`` will be tested.
+        """
+        pass

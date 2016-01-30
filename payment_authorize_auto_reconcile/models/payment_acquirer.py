@@ -27,5 +27,15 @@ class PaymentAcquirer(models.Model):
         string='Pay To Account',
         comodel_name='account.journal',
         domain=[('type', 'in', ['bank', ])],
-        required=True,
+        default=lambda s: s._default_journal_id(),
     )
+
+    def _default_journal_id(self, ):
+        try:
+            return self.company_id.bank_journal_ids[0]
+        except AttributeError:
+            return self.env['account.journal'].search([
+                ('company_id', '=', self.company_id.id),
+                ('type', 'in', ['bank', ])
+            ],
+                limit=1,)
