@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/laslabs/odoo-payment.svg?branch=8.0)](https://travis-ci.org/laslabs/odoo-payment)
-[![Coverage Status](https://coveralls.io/repos/laslabs/odoo-payment/badge.png?branch=8.0)](https://coveralls.io/r/LasLabs/odoo-payment?branch=9.0)
+[![Build Status](https://api.travis-ci.org/laslabs/odoo-payment.svg?branch=release%2F8.0)](https://travis-ci.org/laslabs/odoo-payment)
+[![Coverage Status](https://coveralls.io/repos/laslabs/odoo-payment/badge.png?branch=release%2F8.0)](https://coveralls.io/r/LasLabs/odoo-payment)
 
 Odoo Payment Modules
 ====================

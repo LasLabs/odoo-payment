@@ -20,26 +20,23 @@
 ##############################################################################
 
 from openerp.tests.common import TransactionCase
+# from hashlib import md5
 
 
-class SomethingCase(TransactionCase):
+class TestPaymentTransaction(TransactionCase):
+
     def setUp(self, *args, **kwargs):
-        result = super(SomethingCase, self).setUp(*args, **kwargs)
+        super(TestPaymentTransaction, self).setUp(*args, **kwargs)
 
-        # TODO Replace this for something useful or delete this method
-        self.do_something_before_all_tests()
+        self.invoice_id = self.env['account.invoice'].search([], limit=1)
 
-        return result
+        self.data_vals = {
+            'x_invoice_num': self.invoice_id.reference,
+            'x_trans_id': 1234,
+            # 'x_MD5_Hash': md5().update('TEST').hexdigest(),
+            'x_amount': self.invoice_id.residual,
+        }
 
-    def tearDown(self, *args, **kwargs):
-        # TODO Replace this for something useful or delete this method
-        self.do_something_after_all_tests()
-
-        return super(SomethingCase, self).tearDown(*args, **kwargs)
-
-    def test_something(self):
-        """First line of docstring appears in test logs.
-        Other lines do not.
-        Any method starting with ``test_`` will be tested.
-        """
+    def test_authorize_form_get_tx_from_data_tx_create(self):
+        """ Validate that transaction is created when once doesn't exist """
         pass
