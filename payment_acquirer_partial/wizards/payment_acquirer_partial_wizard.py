@@ -37,7 +37,6 @@ class PaymentAcquirerPartialWizard(models.TransientModel):
 
     def _compute_default_pay_amount(self, ):
         return self._compute_default_invoice_id().residual
-    
 
     def _compute_default_payment_acquirer(self, ):
         invoice_id = self._compute_default_invoice_id()
@@ -145,4 +144,3 @@ class PaymentAcquirerPartialWizard(models.TransientModel):
         )
         _logger.debug('Got payment_block: %s', block)
         return block
-    

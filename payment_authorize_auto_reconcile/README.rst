@@ -1,8 +1,12 @@
-[![Build Status](https://travis-ci.org/laslabs/odoo-payment.svg)](https://travis-ci.org/laslabs/odoo-payment)
- 
-# Auto Authorize.Net Reconciliation
+.. image:: https://img.shields.io/badge/license-AGPL--3-blue.svg
+   :target: http://www.gnu.org/licenses/agpl-3.0-standalone.html
+   :alt: License: AGPL-3
 
-### Automatically reconcile Authorize.net payments against appropriate Invoice
+=================================
+Authorize.Net Auto Reconciliation
+=================================
+
+Automatically reconcile Authorize.net payments against appropriate Invoice
 
 Authorize.net payments do not automatically generate transactions.
 
@@ -11,8 +15,7 @@ This plugin automates the process by creating a transaction and reconciling it a
 Do note that chargebacks will still need to be handled manually.
 
 Example of the error that this solves:
-```
-2015-09-29 05:05:17,979 24363 INFO laslabs werkzeug: 127.0.0.1 - - [29/Sep/2015 05:05:17] "POST /payment/authorize/return/ HTTP/1.0" 500 -
+``2015-09-29 05:05:17,979 24363 INFO laslabs werkzeug: 127.0.0.1 - - [29/Sep/2015 05:05:17] "POST /payment/authorize/return/ HTTP/1.0" 500 -
 2015-09-29 05:05:17,989 24363 ERROR laslabs werkzeug: Error on request:
 Traceback (most recent call last):
   File "/usr/local/lib/python2.7/dist-packages/werkzeug/serving.py", line 180, in run_wsgi
@@ -78,13 +81,32 @@ Traceback (most recent call last):
   File "/usr/lib/python2.7/dist-packages/openerp/addons/payment_authorize/models/authorize.py", line 115, in _authorize_form_get_tx_from_data
     raise ValidationError(error_msg)
 ValidationError: Authorize: received data for reference SALE/2015/1234; no order found
-```
+``
 
-# License
+Configuration
+=============
 
-* Copyright © [LasLabs, Inc.](https://laslabs.com)
-* License AGPL-3
+Update the `Pay To Account` field in the Payment Acquirer form to the
+journal to create vouchers for
 
-# Contributers
+Credits
+=======
+
+Images
+------
+
+* LasLabs: `Icon <https://repo.laslabs.com/projects/TEM/repos/odoo-module_template/browse/module_name/static/description/icon.svg?raw>`_.
+
+Contributors
+------------
 
 * Dave Lasley <dave@laslabs.com>
+
+Maintainer
+----------
+
+.. image:: https://laslabs.com/logo.png
+   :alt: LasLabs Inc.
+   :target: https://laslabs.com
+
+This module is maintained by LasLabs Inc.
