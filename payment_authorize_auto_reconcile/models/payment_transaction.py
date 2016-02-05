@@ -19,7 +19,7 @@
 #
 ##############################################################################
 from openerp import models, api, fields
-from openerp.exceptions import ValidationError
+from openerp.addons.payment.models.payment_acquirer import ValidationError
 import logging
 
 
