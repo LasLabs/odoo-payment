@@ -16,13 +16,13 @@ Available addons
 ----------------
 addon | version | summary
 --- | --- | ---
+[payment_acquirer_partial](payment_acquirer_partial/) | 9.0.1.0.0 | Allow partial payments on invoices
 
 
 Unported addons
 ---------------
 addon | version | summary
 --- | --- | ---
-[payment_acquirer_partial](payment_acquirer_partial/) | 9.0.1.0.0 | Allow partial payments on invoices
 [payment_authorize_auto_reconcile](payment_authorize_auto_reconcile/) | 9.0.1.0.0 | Automatically reconcile payments from Authorize.net
 
 

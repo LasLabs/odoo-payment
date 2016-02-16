@@ -42,6 +42,6 @@
     'data': [
         'wizards/payment_acquirer_partial_wizard_view.xml',
     ],
-    'installable': False,
+    'installable': True,
     'application': False,
 }
