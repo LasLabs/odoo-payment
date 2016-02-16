@@ -35,12 +35,14 @@
     'author': "LasLabs",
     'website': "https://laslabs.com",
     'category': 'Hidden',
-    'version': '8.0.1.0.0',
+    'version': '9.0.1.0.0',
     'depends': [
         'payment_authorize',
         'account_voucher',
     ],
     'data': [
         'views/payment_acquirer_view.xml',
-    ]
+    ],
+    'installable': False,
+    'application': False,
 }

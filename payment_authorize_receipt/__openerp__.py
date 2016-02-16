@@ -1,19 +1,8 @@
 # -*- coding: utf-8 -*-
 ##############################################################################
 #
-#    Copyright (C) LasLabs, Inc [https://laslabs.com]. All Rights Reserved
-#
-##############################################################################
-#
-#    Collaborators of this module:
-#       Written By: Dave Lasley <dave@laslabs.com>
-#
-##############################################################################
-#
-#    This project is mantained by Medical Team:
-#    https://repo.laslabs.com/projects/ODOO/repos/payment
-#
-##############################################################################
+#    Author: Dave Lasley <dave@laslabs.com>
+#    Copyright: 2016-TODAY LasLabs, Inc. [https://laslabs.com]
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -29,19 +18,36 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
+
 {
-    'name': "Partial Invoice Payments in Portal",
-    'license': 'AGPL-3',
-    'author': "LasLabs",
-    'website': "https://laslabs.com",
-    'category': 'Payment',
-    'version': '9.0.1.0.0',
-    'depends': [
-        'payment',
-    ],
-    'data': [
-        'wizards/payment_acquirer_partial_wizard_view.xml',
-    ],
+    "name": "Module name",
+    "summary": "Module summary",
+    "version": "9.0.1.0.0",
+    "category": "Uncategorized",
+    "website": "https://laslabs.com/",
+    "author": "LasLabs",
+    "license": "AGPL-3",
     'installable': False,
     'application': False,
+    "external_dependencies": {
+        "python": [],
+        "bin": [],
+    },
+    "depends": [
+        "base",
+    ],
+    "data": [
+        "security/some_model_security.xml",
+        "security/ir.model.access.csv",
+        "views/assets.xml",
+        "views/report_name.xml",
+        "views/res_partner_view.xml",
+        "wizard/wizard_model_view.xml",
+    ],
+    "demo": [
+        "demo/res_partner_demo.xml",
+    ],
+    "qweb": [
+        "static/src/xml/module_name.xml",
+    ]
 }

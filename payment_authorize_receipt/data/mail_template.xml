@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+    @copyright (C) 2016-TODAY LasLabs, Inc. [https://laslabs.com]
+    @author Dave Lasley <dave@laslabs.com>
+    @license AGPL-3
+-->
+
+<openerp>
+    <data noupdate="0">
+        <!--Email template -->
+        <record id="email_template_payment_receipt" model="mail.template">
+            <field name="name">Authorize.net Payment Receipt Email</field>
+            <field name="email_from">${(object.user_id.email and '%s &lt;%s&gt;' % (object.user_id.name, object.user_id.email) or '')|safe}</field>
+            <field name="subject">Invoice (Ref ${object.number or 'n/a' }) Payment Receipt</field>
+            <field name="partner_to">${object.partner_id.id}</field>
+            <field name="model_id" ref="account.model_account_invoice"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="report_template" ref="account.account_invoices"/>
+            <field name="report_name">Invoice_${(object.number or '').replace('/','_')}_${object.state == 'draft' and 'draft' or ''}</field>
+            <field name="lang">${object.partner_id.lang}</field>
+            <field name="body_html"><![CDATA[
+                <div class="content-wrapper" style="max-width:650px;">
+                    <div class="col-sm-12 highlight">
+                        <p>
+                            Hi ${object.patient_id.name},
+                        </p>
+                        <p>
+                            
+                        </p>
+                        <p>The following appointment has been created successfully</p>
+                        <div class="row"></div>
+
+                        <div class="col-sm-8 highlight">
+                            <p>Doctor....: <b>${object.physician_id.name}</b></p>
+                            <p>Date.....: <b>${ctx.get('appointment_date') or object.appointment_date[:10]}</b><img class="img-responsive" style="float:right;" src="http://agendese.com/website/static/src/img/Agendese/Banners/calendar.png"></p>
+                            <p>Time......: <b>${ctx.get('appointment_time') or object.appointment_date[11:]}</b></p>
+                            <p>Clinic...: <b>${object.institution_id.name}</b></p>
+                            <p>Phone..: <b>${object.institution_id.phone}</b></p>
+                            <p>Address.: <b>${object.institution_id.street} ${object.institution_id.street2}</b></p>
+                        </div>
+                    </div>
+                </div>
+            ]]></field>
+        </record>
+    </data>
+</openerp>
