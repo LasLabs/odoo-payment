@@ -30,37 +30,6 @@ class PaymentAcquirerPartialWizard(models.TransientModel):
     _name = 'payment.acquirer.partial.wizard'
     _description = 'Wizard - choose amount of invoice payment for Authorize'
 
-    def _compute_default_invoice_id(self, ):
-        return self.env['account.invoice'].browse(
-            self._context.get('active_id')
-        )
-
-    def _compute_default_pay_amount(self, ):
-        return self._compute_default_invoice_id().residual
-
-    def _compute_default_payment_acquirer(self, ):
-        invoice_id = self._compute_default_invoice_id()
-        return self.env['payment.acquirer'].search([
-            ('company_id', '=', invoice_id.company_id.id),
-            ('website_published', '=', True),
-        ], limit=1)
-
-    @api.one
-    def _compute_payment_block(self, ):
-        self.payment_block = self._render_payment_block(
-            self.invoice_id.number, self.invoice_id.currency_id,
-            self.pay_amount, self.invoice_id.partner_id,
-        )
-
-    def _compute_default_payment_block(self, ):
-        invoice_id = self._compute_default_invoice_id()
-        return self._render_payment_block(
-            invoice_id.number, invoice_id.currency_id,
-            self._compute_default_pay_amount(),
-            invoice_id.partner_id,
-            self._compute_default_payment_acquirer(),
-        )
-
     company_id = fields.Many2one(
         string='Company',
         comodel_name='res.company',
@@ -70,28 +39,71 @@ class PaymentAcquirerPartialWizard(models.TransientModel):
         string='Invoice',
         comodel_name='account.invoice',
         readonly=True,
-        default=_compute_default_invoice_id,
+        default=lambda s: s._default_invoice_id(),
     )
     pay_amount = fields.Float(
         string='Amount to Pay',
         digits=dp.get_precision('Account'),
         required=True,
-        default=_compute_default_pay_amount,
+        default=lambda s: s._default_pay_amount(),
+    )
+    static_pay_amount = fields.Float(
+        string='Amount to Pay',
+        digits=dp.get_precision('Account'),
+        readonly=True,
+        related='pay_amount',
     )
     acquirer_id = fields.Many2one(
         string='Payment Method',
         comodel_name='payment.acquirer',
-        default=_compute_default_payment_acquirer,
+        default=lambda s: s._default_payment_acquirer(),
         required=True,
     )
     payment_block = fields.Text(
         compute='_compute_payment_block',
-        default=_compute_default_payment_block,
+        default=lambda s: s._default_payment_block(),
         readonly=True,
     )
 
+    @api.model
+    def _default_invoice_id(self, ):
+        return self.env['account.invoice'].browse(
+            self._context.get('active_id')
+        )
+
+    @api.model
+    def _default_pay_amount(self, ):
+        return self._default_invoice_id().residual
+
+    @api.model
+    def _default_payment_acquirer(self, ):
+        invoice_id = self._default_invoice_id()
+        return self.env['payment.acquirer'].search([
+            ('company_id', '=', invoice_id.company_id.id),
+            ('website_published', '=', True),
+        ], limit=1)
+
+    @api.model
+    def _default_payment_block(self, ):
+        invoice_id = self._default_invoice_id()
+        return self._default_payment_acquirer().render(
+            reference=invoice_id.number,
+            currency_id=invoice_id.currency_id.id,
+            amount=self._default_pay_amount(),
+            partner_id=invoice_id.partner_id.id,
+        )
+
+    @api.multi
+    def _compute_payment_block(self, ):
+        for rec_id in self:
+            rec_id.payment_block = rec_id.render(
+                rec_id.invoice_id.number, rec_id.invoice_id.currency_id,
+                rec_id.pay_amount, rec_id.invoice_id.partner_id,
+            )
+
     @api.multi
     def reload(self, ):
+        self.ensure_one()
         imd = self.env['ir.model.data']
         wizard_view_id = imd.xmlid_to_object(
             'payment_acquirer_partial.payment_acquirer_partial_wizard_view'
@@ -117,30 +129,24 @@ class PaymentAcquirerPartialWizard(models.TransientModel):
         }
 
     @api.multi
-    def on_change_data(self, invoice_id, acquirer_id, pay_amount, ):
-        invoice_id = self.env['account.invoice'].browse(invoice_id)
-        payment_block = self._render_payment_block(
-            invoice_id.number, invoice_id.currency_id,
-            pay_amount, invoice_id.partner_id,
-            self.env['payment.acquirer'].browse(acquirer_id),
+    @api.onchange('invoice_id', 'acquirer_id', 'pay_amount')
+    def _onchange_data(self, ):
+        self.ensure_one()
+        self.payment_block = self.render(
+            self.invoice_id.number,
+            self.invoice_id.currency_id,
+            self.pay_amount,
+            self.invoice_id.partner_id,
         )
-        return {
-            'value': {
-                'payment_block': payment_block,
-            }
-        }
 
     @api.multi
-    def _render_payment_block(self, number, currency_id, pay_amount,
-                              partner_id, acquirer_id=None):
-        if acquirer_id is None:
-            self.ensure_one()
-            acquirer_id = self.acquirer_id
-        block = acquirer_id.render_payment_block(
+    def render(self, number, currency_id, pay_amount, partner_id):
+        self.ensure_one()
+        block = self.acquirer_id.render(
             reference=number,
             currency_id=currency_id.id,
             amount=pay_amount,
             partner_id=partner_id.id,
-        )
+        )[0]
         _logger.debug('Got payment_block: %s', block)
         return block

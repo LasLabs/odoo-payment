@@ -22,15 +22,18 @@
                             <field name="company_id" invisible="True" />
                             <field name="acquirer_id"
                                    options="{'no_create': True, }"
-                                   on_change="on_change_data(invoice_id, acquirer_id, pay_amount)"
                                    domain="[
                                         ('company_id', '=', company_id),
                                         ('website_published', '=', True),
                                    ]"/>
-                            <field name="pay_amount"
-                                   on_change="on_change_data(invoice_id, acquirer_id, pay_amount)" />
+                            <field name="pay_amount" />
                         </group>
                         <h2>Payment Portal:</h2>
+                        <strong>
+                            Pay
+                            <field name="static_pay_amount" />
+                            With:
+                        </strong>
                         <field name="payment_block" widget="html" />
                     </sheet>
                     <footer>
