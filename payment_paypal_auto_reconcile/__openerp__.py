@@ -7,7 +7,7 @@
     'license': 'AGPL-3',
     'author': "LasLabs",
     'website': "https://laslabs.com",
-    'category': 'Hidden',
+    'category': 'Payment',
     'version': '9.0.1.0.0',
     'depends': [
         'payment_base_auto_reconcile',
