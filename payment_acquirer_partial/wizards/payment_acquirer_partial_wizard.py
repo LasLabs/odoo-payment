@@ -81,8 +81,10 @@ class PaymentAcquirerPartialWizard(models.TransientModel):
     def _compute_payment_block(self, ):
         for rec_id in self:
             rec_id.payment_block = rec_id.render(
-                rec_id.invoice_id.number, rec_id.invoice_id.currency_id,
-                rec_id.pay_amount, rec_id.invoice_id.partner_id,
+                rec_id.invoice_id.number,
+                rec_id.invoice_id.currency_id,
+                rec_id.pay_amount,
+                rec_id.invoice_id.partner_id,
             )
 
     @api.multi

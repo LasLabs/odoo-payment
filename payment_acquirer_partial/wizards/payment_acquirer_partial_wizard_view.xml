@@ -48,6 +48,7 @@
                     id="payment_acquirer_partial_wizard_action"
                     name="Pay Partial Amount"
                     view_mode="form"
+                    states="open"
                     target="new"
                     key2="client_action_multi"/>
         
