@@ -10,7 +10,7 @@
     'category': 'Hidden',
     'version': '9.0.1.0.0',
     'depends': [
-        'payment_authorize',
+        'payment',
         'account_voucher',
     ],
     'data': [

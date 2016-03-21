@@ -10,6 +10,7 @@
     'category': 'Payment',
     'version': '9.0.1.0.0',
     'depends': [
+        'payment_paypal',
         'payment_base_auto_reconcile',
     ],
     'installable': True,

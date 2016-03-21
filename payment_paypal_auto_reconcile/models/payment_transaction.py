@@ -43,7 +43,7 @@ class PaymentTransaction(models.Model):
                 limit=1
             )
             acquirer_id = self.env['payment.acquirer'].search([
-                ('provider', '=', 'authorize'),
+                ('provider', '=', 'paypal'),
                 ('company_id', '=', invoice_id.company_id.id),
             ],
                 limit=1
@@ -90,7 +90,7 @@ class PaymentTransaction(models.Model):
             acquirer_id = self.env['payment.acquirer'].search([
                 ('provider', '=', 'paypal'),
                 ('company_id', '=', invoice_id.company_id.id),
-                ('paypal_email_account', '=', data.get('business')),
+                ('paypal_seller_account', '=', data.get('receiver_id')),
             ],
                 limit=1
             )
