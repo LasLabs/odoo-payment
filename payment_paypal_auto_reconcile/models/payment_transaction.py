@@ -27,6 +27,9 @@ class PaymentTransaction(models.Model):
         trans_id = data.get('txn_id', 0)
         pay_amount = float(data.get('payment_gross'))
 
+        if not reference:
+            reference = 'INV/2016/0016'
+
         if not reference or not trans_id:
             raise original_error
 
@@ -82,6 +85,8 @@ class PaymentTransaction(models.Model):
         status = data.get('payment_status')
         if status in ['Completed', 'Processed']:
             reference = data.get('item_number')
+            if not reference:
+                reference = 'INV/2016/0016'
             invoice_id = self.env['account.invoice'].search([
                 ('number', '=', reference)
             ],
