@@ -101,19 +101,17 @@ class PaymentTransaction(models.Model):
                 trans_id = data.get('x_trans_id', 0)
                 pay_amount = float(data.get('x_amount'))
 
-                period_id = self.env['account.period'].find(date)
                 name = '%s Transaction ID %s' % (acquirer_id.name, trans_id)
                 partner_id = invoice_id.partner_id
                 if partner_id.parent_id:
                     partner_id = partner_id.parent_id
-                account_id = partner_id.property_account_receivable.id
+                account_id = partner_id.property_account_receivable_id
                 voucher_id = self.env['account.voucher'].create({
                     'name': name,
                     'amount': pay_amount,
                     'company_id': invoice_id.company_id.id,
                     'journal_id': acquirer_id.journal_id.id,
                     'account_id': account_id.id,
-                    'period_id': period_id.id,
                     'partner_id': partner_id.id,
                     'type': 'receipt',
                     'line_ids': [(0, 0, {
