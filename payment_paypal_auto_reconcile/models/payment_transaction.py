@@ -108,7 +108,7 @@ class PaymentTransaction(models.Model):
                 partner_id = invoice_id.partner_id
                 if partner_id.parent_id:
                     partner_id = partner_id.parent_id
-                account_id = partner_id.property_account_receivable.id
+                account_id = partner_id.property_account_receivable_id
                 voucher_id = self.env['account.voucher'].create({
                     'name': name,
                     'amount': pay_amount,
