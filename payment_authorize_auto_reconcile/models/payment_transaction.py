@@ -121,7 +121,7 @@ class PaymentTransaction(models.Model):
                         'partner_id': partner_id.id,
                         'account_id': account_id.id,
                         'type': 'cr',
-                        'move_line_id': invoice_id.move_id.line_id[0].id,
+                        'move_line_id': invoice_id.move_id.line_ids[0].id,
                     })]
                 })
                 voucher_id.signal_workflow('proforma_voucher')
