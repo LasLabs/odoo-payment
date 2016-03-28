@@ -34,9 +34,7 @@ class PaymentTransaction(models.Model):
             raise original_error
 
         tx = self.search([
-            ('reference', '=like', '%s%%' % reference),
-            ('state', '=', 'draft'),
-            ('amount', '=', pay_amount),
+            ('reference', '=', '%s [%s]' % (reference, trans_id)),
         ])
 
         if not tx:
