@@ -120,7 +120,8 @@ class PaymentTransaction(models.Model):
                     'line_ids': [(0, 0, {
                         'name': name,
                         'payment_option': 'without_writeoff',
-                        'amount': pay_amount,
+                        'quantity': 1,
+                        'price_unit': pay_amount,
                         'partner_id': partner_id.id,
                         'account_id': account_id.id,
                         'type': 'cr',
