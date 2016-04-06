@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+    Copyright (C) 2014-[Now] LasLabs [https://laslabs.com]
+    @author Dave Lasley <dave@laslabs.com>
+    The licence is in the file __openerp__.py
+-->
+
+<openerp>
+    <data>
+        
+        <record model="ir.ui.view" id="account_invoice_view_form">
+            <field name="name">account.invoice.view.form</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//button[@states='open']" position="after">
+                    <button name="%(payment_acquirer_partial_wizard_action)d"
+                            string="Charge Payment"
+                            states="open"
+                            type="action"
+                            class="oe_highlight" />
+                </xpath> 
+            </field>
+        </record>
+        
+    </data>
+</openerp>

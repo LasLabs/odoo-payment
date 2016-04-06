@@ -46,11 +46,9 @@
         <act_window src_model="account.invoice"
                     res_model="payment.acquirer.partial.wizard"
                     id="payment_acquirer_partial_wizard_action"
-                    name="Pay Partial Amount"
+                    name="Initiate Payment"
                     view_mode="form"
-                    states="open"
-                    target="new"
-                    key2="client_action_multi"/>
+                    target="new" />
         
     </data>
 </openerp>

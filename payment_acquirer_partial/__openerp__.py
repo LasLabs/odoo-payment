@@ -13,6 +13,7 @@
         'payment',
     ],
     'data': [
+        'views/account_invoice_view.xml',
         'wizards/payment_acquirer_partial_wizard_view.xml',
     ],
     'installable': True,
