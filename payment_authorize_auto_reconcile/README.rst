@@ -6,7 +6,7 @@
 Authorize.Net Auto Reconciliation
 =================================
 
-Automatically reconcile Authorize.net payments against appropriate Invoice
+Automatically reconcile Authorize.net payments against appropriate Invoice.
 
 Authorize.net payments do not automatically generate transactions.
 
