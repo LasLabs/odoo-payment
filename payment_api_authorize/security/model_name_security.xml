@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+    @copyright (C) 2016-TODAY LasLabs, Inc. [https://laslabs.com]
+    @author Dave Lasley <dave@laslabs.com>
+    @license AGPL-3
+-->
+
+<openerp>
+    <data>
+
+        <record id="category" model="ir.module.category">
+            <field name="name">Some model</field>
+        </record>
+
+        <record id="user_group" model="res.groups">
+            <field name="name">User</field>
+            <field name="category_id" ref="category"/>
+            <field name="comment">
+                The user will be able to browse some model.
+            </field>
+        </record>
+
+        <record id="manager_group" model="res.groups">
+            <field name="name">Manager</field>
+            <field name="category_id" ref="category"/>
+            <field name="implied_ids" eval="[(4, ref('user_group'))]"/>
+            <field name="comment">
+                The user will be able to manage some model.
+            </field>
+            <field name="users" eval="[(4, ref('base.user_root'))]"/>
+        </record>
+
+    </data>
+</openerp>
