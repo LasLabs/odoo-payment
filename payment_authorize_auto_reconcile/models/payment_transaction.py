@@ -76,15 +76,18 @@ class PaymentTransaction(models.Model):
             invoice_id = self.env['account.invoice'].search([
                 ('number', '=', reference)
             ], limit=1)
-            acquirer_id = self.env['payment.acquirer'].search([
+            # @TODO: Better multi acquirer support. Maybe x_account_number?
+            acquirer_ids = self.env['payment.acquirer'].search([
                 ('provider', '=', 'authorize'),
-                ('company_id', '=', invoice_id.company_id.id)
-            ], limit=1)
-            if acquirer_id.journal_id:
+                ('company_id', '=', invoice_id.company_id.id),
+            ])
+            # @TODO: Journal ID search was being lame
+            acquirer_ids = acquirer_ids.filtered(lambda r: bool(r.journal_id))
+            if acquirer_ids:
+                acquirer_id = acquirer_ids[0]
                 date = fields.Date.today()
                 trans_id = data.get('x_trans_id', 0)
                 pay_amount = float(data.get('x_amount'))
-
                 period_id = self.env['account.period'].find(date)
                 name = '%s Transaction ID %s' % (acquirer_id.name, trans_id)
                 partner_id = invoice_id.partner_id
