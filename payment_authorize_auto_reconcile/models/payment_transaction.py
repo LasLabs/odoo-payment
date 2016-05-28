@@ -43,7 +43,7 @@ class PaymentTransaction(models.Model):
             ],
                 limit=1,
             )
-            acquirer_id = self.env['payment.acquirer'].search([
+            acquirer_id = self.env['payment.acquirer'].sudo().search([
                 ('provider', '=', 'authorize'),
                 ('company_id', '=', invoice_id.company_id.id)
             ], limit=1)
