@@ -1,25 +1,9 @@
 # -*- coding: utf-8 -*-
-##############################################################################
-#
-#    Author: Dave Lasley <dave@laslabs.com>
-#    Copyright: 2015 LasLabs, Inc.
-#
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU Affero General Public License as
-#    published by the Free Software Foundation, either version 3 of the
-#    License, or (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU Affero General Public License for more details.
-#
-#    You should have received a copy of the GNU Affero General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-##############################################################################
+# © 2016-TODAY LasLabs Inc.
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+
 from openerp import models, api, fields
-from openerp.exceptions import ValidationError
+from openerp.addons.payment_authorize.models.authorize import ValidationError
 import logging
 
 
@@ -55,9 +39,11 @@ class PaymentTransaction(models.Model):
 
         if not tx:
             invoice_id = self.env['account.invoice'].search([
-                ('number', '=', reference)
-            ], limit=1)
-            acquirer_id = self.env['payment.acquirer'].search([
+                ('number', '=', reference),
+            ],
+                limit=1,
+            )
+            acquirer_id = self.env['payment.acquirer'].sudo().search([
                 ('provider', '=', 'authorize'),
                 ('company_id', '=', invoice_id.company_id.id)
             ], limit=1)
@@ -70,10 +56,8 @@ class PaymentTransaction(models.Model):
                 'currency_id': invoice_id.currency_id.id,
                 'partner_id': invoice_id.partner_id.id,
                 'partner_country_id': invoice_id.partner_id.country_id.id,
-                'account_id': invoice_id.account_id.id,
-                'partner_state': data.get('x_state'),
                 'partner_city': data.get('x_city'),
-                'partner_street': data.get('x_address'),
+                'partner_address': data.get('x_address'),
             }
             _logger.debug('Creating tx with %s', tx_vals)
             tx = self.create(tx_vals)
@@ -92,21 +76,24 @@ class PaymentTransaction(models.Model):
             invoice_id = self.env['account.invoice'].search([
                 ('number', '=', reference)
             ], limit=1)
-            acquirer_id = self.env['payment.acquirer'].search([
+            # @TODO: Better multi acquirer support. Maybe x_account_number?
+            acquirer_ids = self.env['payment.acquirer'].search([
                 ('provider', '=', 'authorize'),
-                ('company_id', '=', invoice_id.company_id.id)
-            ], limit=1)
-            if acquirer_id.journal_id:
+                ('company_id', '=', invoice_id.company_id.id),
+            ])
+            # @TODO: Journal ID search was being lame
+            acquirer_ids = acquirer_ids.filtered(lambda r: bool(r.journal_id))
+            if acquirer_ids:
+                acquirer_id = acquirer_ids[0]
                 date = fields.Date.today()
                 trans_id = data.get('x_trans_id', 0)
                 pay_amount = float(data.get('x_amount'))
-
                 period_id = self.env['account.period'].find(date)
                 name = '%s Transaction ID %s' % (acquirer_id.name, trans_id)
                 partner_id = invoice_id.partner_id
-                if partner_id.parent_id:
-                    partner_id = partner_id.parent_id
-                account_id = partner_id.property_account_receivable.id
+                if partner_id.commercial_partner_id:
+                    partner_id = partner_id.commercial_partner_id
+                account_id = partner_id.property_account_receivable
                 voucher_id = self.env['account.voucher'].create({
                     'name': name,
                     'amount': pay_amount,
