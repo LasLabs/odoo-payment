@@ -27,9 +27,6 @@
         'payment_authorize',
         'account_voucher',
     ],
-    'data': [
-        'views/payment_acquirer_view.xml',
-    ],
     'installable': True,
     'application': False,
 }
