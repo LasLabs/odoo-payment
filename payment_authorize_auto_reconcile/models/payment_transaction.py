@@ -19,7 +19,7 @@
 #
 ##############################################################################
 from openerp import models, api, fields
-from openerp.exceptions import ValidationError
+from openerp.addons.payment_authorize.models.authorize import ValidationError
 import logging
 
 
@@ -48,14 +48,18 @@ class PaymentTransaction(models.Model):
             raise original_error
 
         tx = self.search([
-            ('reference', '=', '%s [%s]' % (reference, trans_id)),
+            ('reference', '=like', '%s%%' % reference),
+            ('state', '=', 'draft'),
+            ('amount', '=', pay_amount),
         ])
 
         if not tx:
             invoice_id = self.env['account.invoice'].search([
-                ('number', '=', reference)
-            ], limit=1)
-            acquirer_id = self.env['payment.acquirer'].search([
+                ('number', '=', reference),
+            ],
+                limit=1,
+            )
+            acquirer_id = self.env['payment.acquirer'].sudo().search([
                 ('provider', '=', 'authorize'),
                 ('company_id', '=', invoice_id.company_id.id)
             ], limit=1)
@@ -68,10 +72,8 @@ class PaymentTransaction(models.Model):
                 'currency_id': invoice_id.currency_id.id,
                 'partner_id': invoice_id.partner_id.id,
                 'partner_country_id': invoice_id.partner_id.country_id.id,
-                'account_id': invoice_id.account_id.id,
-                'partner_state': data.get('x_state'),
                 'partner_city': data.get('x_city'),
-                'partner_street': data.get('x_address'),
+                'partner_address': data.get('x_address'),
             }
             _logger.debug('Creating tx with %s', tx_vals)
             tx = self.create(tx_vals)
@@ -90,37 +92,41 @@ class PaymentTransaction(models.Model):
             invoice_id = self.env['account.invoice'].search([
                 ('number', '=', reference)
             ], limit=1)
-            acquirer_id = self.env['payment.acquirer'].search([
+            # @TODO: Better multi acquirer support. Maybe x_account_number?
+            acquirer_ids = self.env['payment.acquirer'].search([
                 ('provider', '=', 'authorize'),
-                ('company_id', '=', invoice_id.company_id.id)
-            ], limit=1)
-            if acquirer_id.journal_id:
+                ('company_id', '=', invoice_id.company_id.id),
+            ])
+            # @TODO: Journal ID search was being lame
+            acquirer_ids = acquirer_ids.filtered(lambda r: bool(r.journal_id))
+            if acquirer_ids:
+                acquirer_id = acquirer_ids[0]
                 date = fields.Date.today()
                 trans_id = data.get('x_trans_id', 0)
                 pay_amount = float(data.get('x_amount'))
-
+                period_id = self.env['account.period'].find(date)
                 name = '%s Transaction ID %s' % (acquirer_id.name, trans_id)
                 partner_id = invoice_id.partner_id
-                if partner_id.parent_id:
-                    partner_id = partner_id.parent_id
-                account_id = partner_id.property_account_receivable_id
+                if partner_id.commercial_partner_id:
+                    partner_id = partner_id.commercial_partner_id
+                account_id = partner_id.property_account_receivable
                 voucher_id = self.env['account.voucher'].create({
                     'name': name,
                     'amount': pay_amount,
                     'company_id': invoice_id.company_id.id,
                     'journal_id': acquirer_id.journal_id.id,
                     'account_id': account_id.id,
+                    'period_id': period_id.id,
                     'partner_id': partner_id.id,
                     'type': 'receipt',
                     'line_ids': [(0, 0, {
                         'name': name,
                         'payment_option': 'without_writeoff',
-                        'quantity': 1,
-                        'price_unit': pay_amount,
+                        'amount': pay_amount,
                         'partner_id': partner_id.id,
                         'account_id': account_id.id,
                         'type': 'cr',
-                        'move_line_id': invoice_id.move_id.line_ids[0].id,
+                        'move_line_id': invoice_id.move_id.line_id[0].id,
                     })]
                 })
                 voucher_id.signal_workflow('proforma_voucher')
