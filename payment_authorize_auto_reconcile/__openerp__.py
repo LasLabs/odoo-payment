@@ -1,22 +1,10 @@
 # -*- coding: utf-8 -*-
-##############################################################################
-#
-#    Copyright (C) LasLabs, Inc [https://laslabs.com]. All Rights Reserved
-#
-##############################################################################
-#
-#    Collaborators of this module:
-#       Written By: Dave Lasley <dave@laslabs.com>
-#
-##############################################################################
-#
-#    This project is mantained by Medical Team:
-#    https://repo.laslabs.com/projects/ODOO/repos/payment
-#
-##############################################################################
+# © 2015-TODAY LasLabs Inc.
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+
 
 {
-    'name': "payment_authorize_auto_reconcile",
+    'name': "Payment Authorize - Auto Reconcile",
     'description': 'Reconcile invoices from Authorize.net payments',
     'license': 'AGPL-3',
     'author': "LasLabs",
