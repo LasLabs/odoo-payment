@@ -25,7 +25,7 @@
     'version': '9.0.1.0.0',
     'depends': [
         'payment_authorize',
-        'account_voucher',
+        'payment_base_auto_reconcile',
     ],
     'installable': True,
     'application': False,
