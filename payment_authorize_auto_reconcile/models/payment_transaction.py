@@ -16,6 +16,12 @@ class PaymentTransaction(models.Model):
     def _authorize_form_get_tx_from_data(self, data):
         """ Overload original method to create transaction if none exists """
 
+        try:
+            return super(PaymentTransaction, self).\
+                _authorize_form_get_tx_from_data(data)
+        except Exception as original_error:
+            pass
+
         reference = data.get('x_invoice_num')
         trans_id = data.get('x_trans_id', 0)
         fingerprint = data.get('x_MD5_Hash')
@@ -69,10 +75,10 @@ class PaymentTransaction(models.Model):
         elif len(tx) > 1:
             raise original_error
 
-        return tx
+        return tx[0]
 
     @api.model
-    def _authorize_form_validate(self, tx, data, ):
+    def _authorize_form_validate(self, tx, data):
         status_code = int(data.get('x_response_code', '0'))
         valid_status = self._authorize_valid_tx_status
         if status_code == valid_status and tx.state != 'done':
