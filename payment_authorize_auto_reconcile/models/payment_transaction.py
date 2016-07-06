@@ -16,12 +16,6 @@ class PaymentTransaction(models.Model):
     def _authorize_form_get_tx_from_data(self, data):
         """ Overload original method to create transaction if none exists """
 
-        # try:
-        #     return super(PaymentTransaction, self).\
-        #         _authorize_form_get_tx_from_data(data)
-        # except Exception as original_error:
-        #     pass
-
         reference = data.get('x_invoice_num')
         trans_id = data.get('x_trans_id', 0)
         fingerprint = data.get('x_MD5_Hash')
@@ -42,6 +36,17 @@ class PaymentTransaction(models.Model):
             ],
                 limit=1,
             )
+
+            if not invoice_id:
+                sale_id = self.env['sale.order'].search([
+                    ('name', '=', reference),
+                ],
+                    limit=1,
+                )
+                invoice_id = self.env['account.invoice'].browse(
+                    sale_id.action_invoice_create()[0]
+                )
+            
             acquirer_id = self.env['payment.acquirer'].sudo().search([
                 ('provider', '=', 'authorize'),
                 ('company_id', '=', invoice_id.company_id.id)

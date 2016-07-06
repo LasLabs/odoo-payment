@@ -17,12 +17,6 @@ class PaymentTransaction(models.Model):
     def _paypal_form_get_tx_from_data(self, data):
         """ Overload original method to create transaction if none exists """
 
-        try:
-            return super(PaymentTransaction, self).\
-                _paypal_form_get_tx_from_data(data)
-        except ValidationError as original_error:
-            pass
-
         reference = data.get('item_number')
         trans_id = data.get('txn_id', 0)
         pay_amount = float(data.get('payment_gross'))
