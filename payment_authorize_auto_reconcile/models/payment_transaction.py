@@ -19,7 +19,6 @@
 #
 ##############################################################################
 from openerp import models, api, fields
-from openerp.addons.payment_authorize.models.authorize import ValidationError
 import logging
 
 
@@ -33,11 +32,11 @@ class PaymentTransaction(models.Model):
     def _authorize_form_get_tx_from_data(self, data):
         """ Overload original method to create transaction if none exists """
 
-        # try:
-        #     return super(PaymentTransaction, self).\
-        #         _authorize_form_get_tx_from_data(data)
-        # except ValidationError as original_error:
-        #     pass
+        try:
+            return super(PaymentTransaction, self).\
+                _authorize_form_get_tx_from_data(data)
+        except Exception as original_error:
+            pass
 
         reference = data.get('x_invoice_num')
         trans_id = data.get('x_trans_id', 0)
