@@ -3,7 +3,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 from openerp import models, api, fields
-from openerp.addons.payment_authorize.models.authorize import ValidationError
 import logging
 
 
@@ -20,7 +19,7 @@ class PaymentTransaction(models.Model):
         try:
             return super(PaymentTransaction, self).\
                 _authorize_form_get_tx_from_data(data)
-        except ValidationError as original_error:
+        except Exception as original_error:
             pass
 
         reference = data.get('x_invoice_num')
