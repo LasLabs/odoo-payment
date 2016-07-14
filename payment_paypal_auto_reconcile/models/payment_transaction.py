@@ -23,12 +23,9 @@ class PaymentTransaction(models.Model):
         except ValidationError as original_error:
             pass
 
-        reference = data.get('item_number')
+        reference = data.get('invoice') or data.get('item_number')
         trans_id = data.get('txn_id', 0)
         pay_amount = float(data.get('payment_gross'))
-
-        if not reference:
-            reference = 'INV/2016/0016'
 
         if not reference or not trans_id:
             raise original_error
@@ -39,15 +36,29 @@ class PaymentTransaction(models.Model):
 
         if not tx:
             invoice_id = self.env['account.invoice'].search([
-                ('number', '=', reference),
+                ('number', '=ilike', reference),
             ],
                 limit=1
             )
+            if not invoice_id:
+                sale_id = self.env['sale.order'].search([
+                    ('name', '=ilike', reference),
+                ],
+                    limit=1,
+                )
+                if not sale_id:
+                    raise original_error
+                if not sale_id.invoice_ids:
+                    try:
+                        sale_id.action_invoice_create()
+                    except:
+                        raise original_error
+                invoice_id = sale_id.invoice_ids[0]
             acquirer_id = self.env['payment.acquirer'].search([
                 ('provider', '=', 'paypal'),
                 ('company_id', '=', invoice_id.company_id.id),
             ],
-                limit=1
+                limit=1,
             )
             currency_id = self.env['res.currency'].search([
                 ('name', '=', data.get('mc_currency')),
