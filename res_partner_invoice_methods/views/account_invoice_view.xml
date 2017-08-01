@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+    Copyright (C) 2014-2015 LasLabs (https://laslabs.com/)
+    @author Dave Lasley <dave@laslabs.com>
+    The licence is in the file __openerp__.py
+-->
+
+<openerp>
+    <data>
+    
+        <record id="account_invoice_view_form" model="ir.ui.view">
+            <field name="name">account.invoice.view.form</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='action_invoice_sent']" position='before'>
+                    <button name="action_invoice_sent_prefs" type="object" string="Send Default"
+                            attrs="{'invisible':['|',('sent','=',True), ('state', '!=', 'open')]}"
+                            class="oe_highlight" groups="base.group_user"/>
+                    <button name="action_invoice_sent_prefs" type="object" string="Send Default"
+                            attrs="{'invisible':['|',('sent','=',False), ('state', '!=', 'open')]}"
+                            groups="base.group_user"/>
+                </xpath>
+            </field>
+            
+        </record>
+        <!--
+        <record id="account_invoice_send_default_form_view" model="ir.ui.view">
+            <field name="name">account.invoice.send.default.form.view</field>
+            <field name="model">account.invoice</field>
+            <field name="arch" type="xml">
+                <form string="Send Invoice(s)?">
+                    <p class="oe_grey">
+                        Invoice(s) will be sent to customers using their specified
+                        delivery method. If the partner prefers to receive their
+                        invoice via a method that is not directly deliverable by
+                        Odoo (such as physical mail), the invoice will be printed
+                        instead.
+                    </p>
+                    <footer>
+                        <button string="Send Invoice(s)" name="action_invoice_sent_prefs"
+                                type="object" default_focus="1" class="btn-primary"/>
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        
+        <act_window id='account_invoice_send_default_form_view'
+                    name='Send Invoice(s)'
+                    src_model='account.invoice'
+                    res_model='account.invoice'
+                    view_mode='form'
+                    target='new'
+                    key2='client_action_multi'/>
+        -->
+    </data>
+</openerp>

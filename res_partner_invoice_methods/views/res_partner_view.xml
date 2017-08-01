@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+    Copyright (C) 2014-2015 LasLabs (https://laslabs.com/)
+    @author Dave Lasley <dave@laslabs.com>
+    The licence is in the file __openerp__.py
+-->
+
+<openerp>
+    <data>
+    
+        <record id="res_partner_form_invoice_pref" model="ir.ui.view">
+            <field name="name">res.partner.form.invoice.pref</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook/page" position='after'>
+                    <page string="Invoicing Preferences">
+                        <group>
+                            <field name="invoice_preference" string="Invoice Delivery Method"/>
+                            <field name="invoice_grouping" string="Invoice Grouping Preference"/>
+                            
+                            <!-- !company -->
+                            <field name="invoice_ccd_on_ids" widget="many2many_tags"
+                                   string="Copied On Invoices By Partner(s)"
+                                   domain="[('parent_id', '=', parent_id)]"
+                                   options="{'create': false, 'create_edit': false}"
+                                   attrs="{'invisible': [('is_company','=', True)]}"
+                                   />
+                            <field name="invoice_cc_ids" string="Copy Partner(s) On Invoices"
+                                   domain="[('parent_id', '=', parent_id)]"
+                                   attrs="{'invisible': [('is_company','=', True)]}"
+                                   />
+                            
+                            <!-- company -->
+                            <field name='invoice_ccd_on_ids' widget="many2many_tags"
+                                   string="Copied On Invoices By Partner(s)"
+                                   domain="[('parent_id', '=', id)]"
+                                   options="{'create': false, 'create_edit': false}"
+                                   attrs="{'invisible': [('is_company','=', False)]}"
+                                   />
+                            <field name="invoice_cc_ids" string="Copy Partner(s) On Invoices"
+                                   domain="[('parent_id', '=', id)]"
+                                   attrs="{'invisible': [('is_company','=', False)]}"
+                                   />
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+            
+        </record>
+    
+    </data>
+</openerp>
