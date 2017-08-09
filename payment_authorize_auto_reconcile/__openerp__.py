@@ -13,6 +13,6 @@
         'payment_authorize',
         'payment_base_auto_reconcile',
     ],
-    'installable': False,
+    'installable': True,
     'application': False,
 }
